@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+
+  app:
+    image: pierrecdn/phpipam
+    env_file: /var/data/config/phpipam/phpipam.env
+    networks:
+      - swarm_default
+    ports:
+      - 8898:80
+      - 8899:443
+
+networks:
+  swarm_default:
+    external: true

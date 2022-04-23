@@ -1,0 +1,20 @@
+version:"3.3"
+
+services:
+  FIDI:
+   image: fireflyiii/data-importer:latest
+   environment:
+     - FIREFLY_III_ACCESS_TOKEN=(here)
+     - FIREFLY_III_URL=(here)
+     - NORDIGEN_ID=(here)
+     - NORDIGEN_KEY=(here)
+     - SPECTRE_APP_ID=(here)
+     - SPECTRE_SECRET=(here)
+   ports:
+     - 8085:8080
+   networks:
+     - swarm_default
+
+networks:
+  swarm_default:
+    external: true

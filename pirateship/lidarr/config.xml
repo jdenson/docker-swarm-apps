@@ -1,0 +1,15 @@
+<Config>
+  <LogLevel>info</LogLevel>
+  <BindAddress>*</BindAddress>
+  <EnableSsl>True</EnableSsl>
+  <SslCertPath>/app_certs/cert.pfx</SslCertPath>
+  <Port>8686</Port>
+  <UrlBase></UrlBase>
+  <ApiKey>5ad2158e774a4cb19e355ee5dec08b74</ApiKey>
+  <AuthenticationMethod>None</AuthenticationMethod>
+  <UpdateMechanism>Docker</UpdateMechanism>
+  <SslPort>6869</SslPort>
+  <LaunchBrowser>True</LaunchBrowser>
+  <Branch>master</Branch>
+  <SslCertPassword></SslCertPassword>
+</Config>

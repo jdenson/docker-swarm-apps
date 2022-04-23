@@ -1,0 +1,212 @@
+version: "3.2"
+
+## Plex is not included in this stack as I assume most people will run it on a dedicated server, but if not, you can always add it yourself.
+## Ports specified are default ports for each app unless bound to another port due to conflicts.
+## Path bindings should be changed where specified to point to your own storage locations. I *HIGHLY* recommend using shared storage such as a NAS/Ceph/etc that each Docker node has access to.
+
+services:
+  lidarr:
+    image: linuxserver/lidarr:latest
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=America/Chicago
+    volumes:
+      - /nfs/nas/Plex Music:/music # replace with your own path
+      - /nfs/nas/Downloads/lidarr:/downloads # replace with your own path
+      - /var/data/config/pirateship/lidarr:/config
+      - /var/data/certs:/app_certs
+    deploy:
+      replicas: 1
+    networks:
+      - swarm_default
+    ports:
+      - 8686
+      - 6869 #ssl
+
+  prowlarr:
+    image: linuxserver/prowlarr:develop
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=America/Chicago
+    volumes:
+      - /nfs/nas/Downloads:/media # replace with your own path
+      - /var/data/config/pirateship/prowlarr:/config
+      - /var/data/certs:/app_certs
+    deploy:
+      replicas: 1
+    networks:
+      - swarm_default
+    ports:
+      - 9696
+      - 6969 #ssl
+
+  radarr:
+    image: linuxserver/radarr:latest
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=America/Chicago
+    volumes:
+      - /nfs/nas/Plex Movies:/Movies # replace with your own path
+      - /nfs/nas/Downloads/radarr:/downloads # replace with your own path
+      - /var/data/config/pirateship/radarr:/config
+      - /nfs/nas/Downloads:/media # replace with your own path
+      - /var/data/certs:/app_certs
+    deploy:
+      replicas: 1
+    networks:
+      - swarm_default
+    ports:
+      - 7878
+      - 9899 #ssl
+
+  readarr:
+    image: linuxserver/readarr:nightly
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=America/Chicago
+    ports:
+      - 8787
+      - 6868 #ssl
+    volumes:
+      - /nfs/nas/books:/books # replace with your own path
+      - /var/data/config/pirateship/readarr:/config
+      - /nfs/nas/Downloads:/media # replace with your own path
+      - /var/data/certs:/app_certs
+    deploy:
+      replicas: 1
+    networks:
+      - swarm_default
+
+  sonarr:
+    image: linuxserver/sonarr:latest
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=America/Chicago
+    volumes:
+      - /nfs/nas/Plex TV:/tv # replace with your own path
+      - /nfs/nas/Downloads/sonarr:/downloads # replace with your own path
+      - /var/data/config/pirateship/sonarr:/config
+      - /nfs/nas/Downloads:/media # replace with your own path
+      - /var/data/certs:/app_certs
+    deploy:
+      replicas: 1
+    networks:
+      - swarm_default
+    ports:
+      - 8989
+      - 9898 #ssl
+
+  deluge:
+    image: linuxserver/deluge
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=America/Chicago
+      - DELUGE_LOGLEVEL=error #optional
+    volumes:
+      - /var/data/config/pirateship/deluge:/config
+      - /nfs/nas/Downloads/torrents:/downloads # replace with your own path
+      - /nfs/nas/Downloads:/media # replace with your own path
+      - /var/data/certs:/app_certs
+    deploy:
+      replicas: 1
+    networks:
+      - swarm_default
+    ports:
+      - 8112
+      - 6881
+      - 6881/udp
+
+
+  overseerr:
+    image: linuxserver/overseerr
+    volumes:
+      - /var/data/config/pirateship/overseerr:/app/config
+      - /nfs/nas/Downloads:/media # replace with your own path
+      - /var/data/certs:/app_certs
+    deploy:
+      replicas: 1
+    networks:
+      - swarm_default
+    ports:
+      - 5055
+
+  sabnzbd:
+    image: linuxserver/sabnzbd
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=America/Chicago
+    volumes:
+      - /nfs/nas/Downloads:/downloads # replace with your own path
+      - /nfs/nas/Downloads:/media # replace with your own path
+      - /var/data/config/pirateship/sabnzbd/:/config
+      - /var/data/certs:/app_certs
+    deploy:
+      replicas: 1
+    networks:
+      - swarm_default
+    ports:
+      - 8181:8080
+      - 8443 #ssl
+
+  nzbhydra:
+    image: linuxserver/nzbhydra2:latest
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=America/Chicago
+    volumes:
+      - /var/data/config/pirateship/nzbhydra:/config
+      - /nfs/nas/Downloads:/media # replace with your own path
+      - /var/data/certs:/app_certs
+    deploy:
+      replicas: 1
+    networks:
+      - swarm_default
+    ports:
+      - 5076
+
+  nzbget:
+    image: linuxserver/nzbget:latest
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=America/Chicago
+    volumes:
+      - /nfs/nas/Downloads:/media # replace with your own path
+      - /var/data/config/pirateship/nzbget:/config
+      - /var/data/certs:/app_certs
+    deploy:
+      replicas: 1
+    networks:
+      - swarm_default
+    ports:
+      - 6789
+      - 6791 #ssl
+
+  lazylibrarian:
+    image: linuxserver/lazylibrarian:latest
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=America/Chicago
+    volumes:
+      - /nfs/nas/Downloads:/media # replace with your own path
+      - /var/data/config/pirateship/lazylibrarian:/config
+      - /var/data/certs:/app_certs
+    deploy:
+      replicas: 1
+    networks:
+      - swarm_default
+    ports:
+      - 5299
+
+networks:
+  swarm_default:
+    external: true

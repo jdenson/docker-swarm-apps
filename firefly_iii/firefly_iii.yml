@@ -1,0 +1,21 @@
+version: '3.3'
+
+services:
+  firefly_III:
+    image: fireflyiii/core:latest
+    deploy:
+      replicas: 1
+    volumes:
+      - firefly_iii_upload:/var/www/html/storage/upload
+    env_file: firefly_iii.env
+    ports:
+      - 8082:8080
+    networks:
+      - swarm_default
+
+volumes:
+  firefly_iii_upload:
+
+networks:
+  swarm_default:
+    external: true

@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+
+  db:
+    image: mariadb:10
+    env_file: /var/data/config/bookstack/bookstack.env
+    networks:
+      - internal
+    volumes:
+      - /var/data/runtime/bookstack/db:/var/lib/mysql
+
+  app:
+    image: linuxserver/bookstack
+    env_file: /var/data/config/bookstack/bookstack.env
+    environment:
+      - APP_URL:http://127.0.0.1:8182
+    networks:
+      - swarm_default
+      - internal
+    ports:
+      - 8182:80
+    deploy:
+      replicas: 1
+
+  db-backup:
+    image: mariadb:10
+    env_file: /var/data/config/bookstack/bookstack.env
+    deploy:
+      replicas: 1
+    volumes:
+      - /var/data/bookstack/database-dump:/dump
+      - /etc/localtime:/etc/localtime:ro
+    entrypoint: |
+      bash -c 'bash -s <<EOF
+      trap "break;exit" SIGHUP SIGINT SIGTERM
+      sleep 2m
+      while /bin/true; do
+        mysqldump -h db --all-databases | gzip -c > /dump/dump_\`date +%d-%m-%Y"_"%H_%M_%S\`.sql.gz
+        ls -tr /dump/dump_*.sql.gz | head -n -"$$BACKUP_NUM_KEEP" | xargs -r rm
+        sleep $$BACKUP_FREQUENCY
+      done
+      EOF'
+    networks:
+      - internal
+
+networks:
+  swarm_default:
+    external: true
+  internal:
+    driver: overlay
+    ipam:
+      config:
+        - subnet: 172.16.33.0/24

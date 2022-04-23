@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  calibre-web:
+    image: linuxserver/calibre-web:latest
+#    env_file: /var/data/config/calibre-web/calibre-web.env
+    volumes:
+      - /var/data/config/calibre-web:/config
+      # Set this next volume to wherever you store your Calibre library. From the container's perspective, this has to be /books/
+      - /nfs/nas/books:/books
+    deploy:
+      replicas: 1      
+    networks:
+      - swarm_default
+    ports:
+      - 8083:8083
+
+networks:
+  swarm_default:
+    external: true
+  internal:
+    driver: overlay
+    ipam:
+      config:
+        - subnet: 172.16.17.0/24

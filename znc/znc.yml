@@ -1,0 +1,21 @@
+version: "3.2"
+
+services:
+  app:
+    image: linuxserver/znc:latest
+    environment:
+      - TZ=America/Chicago
+      - PUID=1000
+      - PGID=1000
+    deploy:
+      replicas: 1
+    networks:
+      - swarm_default
+    ports:
+      - 6501
+    volumes:
+      - /var/data/config/znc:/znc-data
+
+networks:
+  swarm_default:
+    external: true

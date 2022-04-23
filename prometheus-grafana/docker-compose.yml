@@ -1,0 +1,117 @@
+version: "3.7"
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - /var/data/config/prometheus-grafana/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - swarm_default
+      - internal
+    ports:
+      - 9090:9090
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      resources:
+        limits:
+          memory: 2048M
+        reservations:
+          memory: 128M
+
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      GF_RENDERING_SERVER_URL: http://renderer:8081/render
+      GF_RENDERING_CALLBACK_URL: http://grafana:3000/
+      GF_LOG_FILTERS: rendering:debug
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    volumes:
+      - /var/data/config/prometheus-grafana/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - /var/data/config/prometheus-grafana/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yaml
+    networks:
+      - swarm_default
+      - internal
+    ports:
+      - 3000
+    links:
+      - prometheus
+
+  renderer:
+    image: grafana/grafana-image-renderer:latest
+    networks:
+      - internal
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    command:
+      - '--path.sysfs=/host/sys'
+      - '--path.procfs=/host/proc'
+      - '--collector.textfile.directory=/etc/node-exporter/'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+      - '--no-collector.ipvs'
+    environment:
+      - NODE_ID={{.Node.ID}}
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /etc/hostname:/etc/nodename
+    deploy:
+      mode: global
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+    networks:
+      - internal
+
+  alertmanager:
+    image: quay.io/prometheus/alertmanager:latest
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+    networks:
+      - internal
+      - swarm_default
+
+  cadvisor:
+    image: google/cadvisor:latest
+    command: -logtostderr -docker_only
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    ports:
+      - 8089:8080
+    networks:
+      - internal
+      - swarm_default
+    deploy:
+      mode: global
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+
+networks:
+  swarm_default:
+    external: true
+  internal:
+    driver: overlay
+    ipam:
+      config:
+        - subnet: 10.45.50.0/24

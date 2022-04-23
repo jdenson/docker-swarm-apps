@@ -1,0 +1,22 @@
+version: "3"
+services:
+  bitwarden:
+    image: vaultwarden/server
+    env_file: /var/data/config/bitwarden/bitwarden.env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/data/bitwarden:/data/:rw
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+    networks:
+      - swarm_default
+    ports:
+      - 8182:80
+      - 8183:443
+      - 3012
+
+networks:
+  swarm_default:
+    external: true

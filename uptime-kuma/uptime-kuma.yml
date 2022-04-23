@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  app:
+    image: louislam/uptime-kuma
+    volumes:
+      - /var/data/config/uptime-kuma:/app/data
+    deploy:
+      replicas: 1
+    networks:
+      - swarm_default
+    ports:
+      - 3001
+
+networks:
+  swarm_default:
+    external: true

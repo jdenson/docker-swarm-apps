@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  baserow:
+    image: baserow/baserow:1.9.1
+    env_file: /var/data/config/baserow/baserow.env
+    volumes:
+      - /var/data/config/baserow/data:/baserow/data
+    networks:
+      - swarm_default
+    ports:
+      - 8078:80
+      - 8079:443
+    deploy:
+      replicas: 1
+
+
+networks:
+  swarm_default:
+    external: true

@@ -1,0 +1,20 @@
+version: "3.2"
+
+services:
+  heimdall:
+    image: linuxserver/heimdall:latest
+    environment:
+      - TZ=America/Chicago
+    volumes:
+      - /var/data/config/heimdall:/config
+    deploy:
+      replicas: 1
+    networks:
+      - swarm_default
+    ports:
+      - 80
+      - 443
+
+networks:
+  swarm_default:
+    external: true

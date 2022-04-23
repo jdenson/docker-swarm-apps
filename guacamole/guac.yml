@@ -1,0 +1,33 @@
+version: "3.2"
+
+services:
+
+    guacd:
+      image: guacamole/guacd:latest
+      deploy:
+        replicas: 1
+      networks:
+        - internal
+        - swarm_default
+
+    guac:
+      image: guacamole/guacamole:latest
+      env_file: /var/data/config/guacamole/guac.env
+      volumes:
+        - /var/data/config/guacamole/data:/etc/guacamole
+      deploy:
+        replicas: 1
+      networks:
+        - internal
+        - swarm_default
+      ports:
+        - 8783:8080
+
+networks:
+  swarm_default:
+    external: true
+  internal:
+    driver: overlay
+    ipam:
+      config:
+        - subnet: 10.26.27.0/24

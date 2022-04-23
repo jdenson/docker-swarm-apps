@@ -1,0 +1,22 @@
+version: "3.3"
+
+services:
+  tautulli:
+    image: linuxserver/tautulli:latest
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    volumes:
+      - /var/data/config/tautulli:/config
+      - /var/data/certs:/app_certs
+    deploy:
+      replicas: 1
+    ports:
+      - 8181
+    networks:
+      - swarm_default
+
+networks:
+  swarm_default:
+    external: true

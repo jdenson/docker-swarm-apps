@@ -1,0 +1,20 @@
+version: "3.0"
+
+services:
+    owntracks-app:
+      image: funkypenguin/owntracks
+      env_file: /var/data/config/owntracks/owntracks.env
+      deploy:
+        replicas: 1
+      volumes:
+        - /var/data/config/owntracks:/owntracks
+      networks:
+        - swarm_default
+      ports:
+        - 1883
+        - 8883
+        - 8083
+
+networks:
+  swarm_default:
+    external: true
