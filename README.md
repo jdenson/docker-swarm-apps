@@ -1,7 +1,7 @@
 # docker-swarm-apps
 a collection of Dockerized apps adapted for Swarm
 
-# I do not provide support for anyything in this repo.
+# I do not provide support for anything in this repo.
 
 It is simply a collection of my personal compose files that I have configured for use in Docker Swarm.
 
