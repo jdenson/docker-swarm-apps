@@ -19,3 +19,6 @@ I will not be held liable or provide assistance for anything not working as expe
 # Important Note
 
 I manage all my Docker containers, Swarm stacks, and container networks with Portainer, and I highly recommend you do the same or find a preferable alternative as it will make your life much easier.
+
+
+These configurations files are largely based on the "recipes" kindly provided by FunkyPenguin: [website](https://geek-cookbook.funkypenguin.co.nz/)  [GitHub](https://github.com/geek-cookbook)
